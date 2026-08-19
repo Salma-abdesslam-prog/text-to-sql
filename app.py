@@ -236,18 +236,20 @@ with tab_query:
             "What is the monthly revenue breakdown?",
         ]
 
+        if "question_input" not in st.session_state:
+            st.session_state.question_input = ""
+
         st.markdown('<p class="example-label">💡 Try an example:</p>', unsafe_allow_html=True)
         cols = st.columns(4)
-        clicked_example = None
         for i, ex in enumerate(EXAMPLES):
             if cols[i % 4].button(ex, key=f"ex_{i}", use_container_width=True):
-                clicked_example = ex
+                st.session_state.question_input = ex
 
         # ── Question input ────────────────────────────
         st.markdown("#### Ask your question")
         question = st.text_area(
             "Natural language question",
-            value=clicked_example or "",
+            key="question_input",
             placeholder="e.g. Show me all customers from France who placed more than 2 orders",
             height=90,
             label_visibility="collapsed",
