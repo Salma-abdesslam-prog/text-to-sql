@@ -1,0 +1,14 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Test database (regenerated automatically on first connect)
+data/test_store.db
+
+# Streamlit
+.streamlit/secrets.toml
