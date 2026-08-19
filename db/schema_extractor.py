@@ -68,6 +68,13 @@ def get_table_names(engine) -> list[str]:
     return inspect(engine).get_table_names()
 
 
+def get_row_count(engine, table: str) -> int:
+    """Return the total number of rows in a table."""
+    with engine.connect() as conn:
+        result = conn.execute(text(f"SELECT COUNT(*) FROM {table}"))
+        return result.scalar() or 0
+
+
 def get_sample_rows(engine, table: str, limit: int = 3) -> list[dict]:
     """Return a few sample rows from a table for context."""
     with engine.connect() as conn:

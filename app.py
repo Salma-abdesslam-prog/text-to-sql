@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 from core.text_to_sql import TextToSQL
 from core.llm_client import GROQ_MODELS
 from db.connector import get_sqlite_engine, get_mysql_engine
-from db.schema_extractor import extract_schema, get_table_names, get_sample_rows
+from db.schema_extractor import extract_schema, get_table_names, get_sample_rows, get_row_count
 from db.query_executor import execute_query, QueryExecutionError
 from data.init_db import init_test_database, get_db_path
 
@@ -335,7 +335,21 @@ with tab_preview:
     else:
         preview_col, rows_col = st.columns([3, 1])
         selected_table = preview_col.selectbox("Table", tables, key="preview_table")
-        n_rows = rows_col.number_input("Rows", min_value=1, max_value=100, value=10, step=5)
+
+        total_rows = get_row_count(st.session_state.engine, selected_table)
+
+        # Reset the row count to the table's total whenever the selected table changes
+        if st.session_state.get("preview_rows_table") != selected_table:
+            st.session_state.preview_rows = max(total_rows, 1)
+            st.session_state.preview_rows_table = selected_table
+
+        n_rows = rows_col.number_input(
+            "Rows",
+            min_value=1,
+            max_value=max(total_rows, 1),
+            step=5,
+            key="preview_rows",
+        )
 
         try:
             sample = get_sample_rows(st.session_state.engine, selected_table, limit=int(n_rows))
